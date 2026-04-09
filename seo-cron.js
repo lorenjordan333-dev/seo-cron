@@ -9,21 +9,21 @@ const SUPABASE_URL = "https://vgownqjsqzdaewxidtdp.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZnb3ducWpzcXpkYWV3eGlkdGRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2OTM1NDksImV4cCI6MjA5MTI2OTU0OX0.TNnX9E2_dBGzZG6gqMGKC8LgODwoL5og0pVMbq0laoo";
 const WEBSITE_URL = "https://sandton-locksmith.co.za";
 
-// Weekly keyword schedule - cycles through keywords one per day
+// Weekly keyword schedule with matching area page URLs
 const KEYWORDS = [
-  "sandton locksmith",
-  "24 hour locksmiths near me",
-  "locksmith emergency near me",
-  "locksmith fourways",
-  "locksmith rivonia",
-  "locksmith midrand",
-  "locksmith bryanston",
-  "locksmiths near me",
-  "locksmith centurion",
-  "locksmith lonehill",
+  { keyword: "sandton locksmith", areaUrl: `${WEBSITE_URL}/locksmith-sandton` },
+  { keyword: "24 hour locksmiths near me", areaUrl: `${WEBSITE_URL}/locksmith-sandton` },
+  { keyword: "locksmith emergency near me", areaUrl: `${WEBSITE_URL}/locksmith-sandton` },
+  { keyword: "locksmith fourways", areaUrl: `${WEBSITE_URL}/locksmith-fourways` },
+  { keyword: "locksmith rivonia", areaUrl: `${WEBSITE_URL}/locksmith-rivonia` },
+  { keyword: "locksmith midrand", areaUrl: `${WEBSITE_URL}/locksmith-midrand` },
+  { keyword: "locksmith bryanston", areaUrl: `${WEBSITE_URL}/locksmith-bryanston` },
+  { keyword: "locksmiths near me", areaUrl: `${WEBSITE_URL}/locksmith-sandton` },
+  { keyword: "locksmith centurion", areaUrl: `${WEBSITE_URL}/locksmith-centurion` },
+  { keyword: "locksmith lonehill", areaUrl: `${WEBSITE_URL}/locksmith-lonehill` },
 ];
 
-function getTodayKeyword() {
+function getTodayEntry() {
   const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
   return KEYWORDS[dayOfYear % KEYWORDS.length];
 }
@@ -37,25 +37,28 @@ function generateSlug(title) {
     .trim();
 }
 
-async function generateArticle(keyword) {
+async function generateArticle(keyword, areaUrl) {
   console.log("Generating article for keyword:", keyword);
 
   const prompt = `Write a professional SEO blog post for a locksmith business in the Sandton area, South Africa, targeting the keyword: "${keyword}".
 
 Requirements:
 - Length: 600-700 words
-- Format: HTML (use <h1>, <h2>, <p>, <ul>, <li> tags)
+- Format: HTML (use <h1>, <h2>, <p>, <ul>, <li> tags only)
 - Include the keyword naturally 4-6 times
-- Include internal links using this format: <a href="${WEBSITE_URL}">${WEBSITE_URL}</a> at least twice
+- Include exactly 2 internal links:
+  1. Link to the area page: <a href="${areaUrl}">${keyword}</a>
+  2. Link to contact page: <a href="${WEBSITE_URL}/contact">contact us</a>
 - Write about local areas: Sandton, Fourways, Rivonia, Midrand, Bryanston, Lonehill, Centurion
 - Tone: professional, helpful, trustworthy
 - Include a call to action at the end
 - Do NOT include <html>, <head>, <body> tags — just the article content
-- Start with an <h1> tag as the title
+- Do NOT wrap content in markdown code fences
+- Start directly with an <h1> tag as the title
 
-Also provide at the very end (after the HTML):
-META_TITLE: [60 char max title]
-META_DESCRIPTION: [155 char max description]`;
+After the HTML content add these two lines:
+META_TITLE: [60 char max title including keyword]
+META_DESCRIPTION: [155 char max description including keyword]`;
 
   const message = await anthropic.messages.create({
     model: "claude-sonnet-4-6",
@@ -114,10 +117,11 @@ async function publishArticle(article) {
 async function run() {
   console.log("🚀 SEO Cron Job starting -", new Date().toISOString());
 
-  const keyword = getTodayKeyword();
+  const { keyword, areaUrl } = getTodayEntry();
   console.log("📝 Today's keyword:", keyword);
+  console.log("🔗 Area URL:", areaUrl);
 
-  const article = await generateArticle(keyword);
+  const article = await generateArticle(keyword, areaUrl);
   console.log("✅ Article generated:", article.title);
 
   await publishArticle(article);
