@@ -40,7 +40,15 @@ function generateSlug(title) {
 async function generateArticle(keyword, areaUrl) {
   console.log("Generating article for keyword:", keyword);
 
-  const prompt = `Write a professional SEO blog post for a locksmith business in the Sandton area, South Africa, targeting the keyword: "${keyword}".
+  const prompt = `Write a professional SEO blog post for a mobile locksmith business in the Sandton area, South Africa, targeting the keyword: "${keyword}".
+
+IMPORTANT RULES:
+- This is a MOBILE locksmith service only
+- NEVER mention key cutting or key duplication — we do not offer these services
+- Services we offer: lockouts (car, home, office), lock changes, lock repairs, emergency locksmith
+- Do NOT include <html>, <head>, <body> tags
+- Do NOT wrap content in markdown code fences like \`\`\`html
+- Start directly with an <h1> tag
 
 Requirements:
 - Length: 600-700 words
@@ -52,9 +60,6 @@ Requirements:
 - Write about local areas: Sandton, Fourways, Rivonia, Midrand, Bryanston, Lonehill, Centurion
 - Tone: professional, helpful, trustworthy
 - Include a call to action at the end
-- Do NOT include <html>, <head>, <body> tags — just the article content
-- Do NOT wrap content in markdown code fences
-- Start directly with an <h1> tag as the title
 
 After the HTML content add these two lines:
 META_TITLE: [60 char max title including keyword]
@@ -73,7 +78,7 @@ META_DESCRIPTION: [155 char max description including keyword]`;
   const metaDescMatch = fullResponse.match(/META_DESCRIPTION:\s*(.+)/);
 
   const metaTitle = metaTitleMatch ? metaTitleMatch[1].trim() : `${keyword} - Sandton Locksmith`;
-  const metaDescription = metaDescMatch ? metaDescMatch[1].trim() : `Professional locksmith services for ${keyword}. Available 24/7 in Sandton and surrounding areas.`;
+  const metaDescription = metaDescMatch ? metaDescMatch[1].trim() : `Professional mobile locksmith services for ${keyword}. Available 24/7 in Sandton and surrounding areas.`;
 
   // Extract just the HTML content (before META_TITLE line)
   const htmlContent = fullResponse.split(/META_TITLE:/)[0].trim();
