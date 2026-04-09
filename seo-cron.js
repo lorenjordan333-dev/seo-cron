@@ -9,6 +9,16 @@ const SUPABASE_URL = "https://vgownqjsqzdaewxidtdp.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZnb3ducWpzcXpkYWV3eGlkdGRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2OTM1NDksImV4cCI6MjA5MTI2OTU0OX0.TNnX9E2_dBGzZG6gqMGKC8LgODwoL5og0pVMbq0laoo";
 const WEBSITE_URL = "https://sandton-locksmith.co.za";
 
+// Service pages
+const SERVICES = {
+  emergency: `${WEBSITE_URL}/services/emergency-locksmith`,
+  lockChange: `${WEBSITE_URL}/services/lock-change-services`,
+  residential: `${WEBSITE_URL}/services/residential-locksmith`,
+  commercial: `${WEBSITE_URL}/services/commercial-locksmith`,
+  automotive: `${WEBSITE_URL}/services/automotive-locksmith`,
+  contact: `${WEBSITE_URL}/contact`,
+};
+
 // Weekly keyword schedule with matching area page URLs
 const KEYWORDS = [
   { keyword: "sandton locksmith", areaUrl: `${WEBSITE_URL}/locksmith-sandton` },
@@ -43,23 +53,29 @@ async function generateArticle(keyword, areaUrl) {
   const prompt = `Write a professional SEO blog post for a mobile locksmith business in the Sandton area, South Africa, targeting the keyword: "${keyword}".
 
 IMPORTANT RULES:
-- This is a MOBILE locksmith service only
+- This is a MOBILE locksmith service only — we come to you
 - NEVER mention key cutting or key duplication — we do not offer these services
-- Services we offer: lockouts (car, home, office), lock changes, lock repairs, emergency locksmith
+- Services we offer: emergency lockouts (car, home, office), lock changes, residential locksmith, commercial locksmith, automotive locksmith
 - Do NOT include <html>, <head>, <body> tags
 - Do NOT wrap content in markdown code fences like \`\`\`html
 - Start directly with an <h1> tag
 
+INTERNAL LINKS — you MUST include all of these naturally in the article:
+1. Area page: <a href="${areaUrl}">${keyword}</a>
+2. Emergency locksmith: <a href="${SERVICES.emergency}">emergency locksmith</a>
+3. Lock change: <a href="${SERVICES.lockChange}">lock change services</a>
+4. Residential: <a href="${SERVICES.residential}">residential locksmith</a>
+5. Automotive: <a href="${SERVICES.automotive}">automotive locksmith</a>
+6. Contact: <a href="${SERVICES.contact}">contact us</a>
+
 Requirements:
-- Length: 600-700 words
+- Length: 650-750 words
 - Format: HTML (use <h1>, <h2>, <p>, <ul>, <li> tags only)
-- Include the keyword naturally 4-6 times
-- Include exactly 2 internal links:
-  1. Link to the area page: <a href="${areaUrl}">${keyword}</a>
-  2. Link to contact page: <a href="${WEBSITE_URL}/contact">contact us</a>
+- Include the main keyword naturally 4-6 times
 - Write about local areas: Sandton, Fourways, Rivonia, Midrand, Bryanston, Lonehill, Centurion
 - Tone: professional, helpful, trustworthy
-- Include a call to action at the end
+- Include a strong call to action at the end
+- Make all internal links fit naturally into the text — do not list them, weave them in
 
 After the HTML content add these two lines:
 META_TITLE: [60 char max title including keyword]
@@ -67,7 +83,7 @@ META_DESCRIPTION: [155 char max description including keyword]`;
 
   const message = await anthropic.messages.create({
     model: "claude-sonnet-4-6",
-    max_tokens: 2000,
+    max_tokens: 2500,
     messages: [{ role: "user", content: prompt }],
   });
 
