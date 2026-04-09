@@ -50,40 +50,102 @@ function generateSlug(title) {
 async function generateArticle(keyword, areaUrl) {
   console.log("Generating article for keyword:", keyword);
 
-  const prompt = `Write a professional SEO blog post for a mobile locksmith business in the Sandton area, South Africa, targeting the keyword: "${keyword}".
+  const prompt = `You are an expert SEO content writer specializing in local service businesses (locksmith, emergency services).
 
-IMPORTANT RULES:
-- This is a MOBILE locksmith service only — we come to you
-- NEVER mention key cutting or key duplication — we do not offer these services
-- Services we offer: emergency lockouts (car, home, office), lock changes, residential locksmith, commercial locksmith, automotive locksmith
-- Do NOT include <html>, <head>, <body> tags
-- Do NOT wrap content in markdown code fences like \`\`\`html
-- Start directly with an <h1> tag
+Your task is to generate a high-ranking, conversion-optimized blog article for a mobile locksmith business targeting this keyword: "${keyword}"
 
-INTERNAL LINKS — you MUST include all of these naturally in the article:
-1. Area page: <a href="${areaUrl}">${keyword}</a>
-2. Emergency locksmith: <a href="${SERVICES.emergency}">emergency locksmith</a>
-3. Lock change: <a href="${SERVICES.lockChange}">lock change services</a>
-4. Residential: <a href="${SERVICES.residential}">residential locksmith</a>
-5. Automotive: <a href="${SERVICES.automotive}">automotive locksmith</a>
-6. Contact: <a href="${SERVICES.contact}">contact us</a>
+Website: ${WEBSITE_URL}
 
-Requirements:
-- Length: 650-750 words
-- Format: HTML (use <h1>, <h2>, <p>, <ul>, <li> tags only)
-- Include the main keyword naturally 4-6 times
-- Write about local areas: Sandton, Fourways, Rivonia, Midrand, Bryanston, Lonehill, Centurion
-- Tone: professional, helpful, trustworthy
-- Include a strong call to action at the end
-- Make all internal links fit naturally into the text — do not list them, weave them in
+⚠️ CRITICAL RULES — NO EXCEPTIONS:
+- This is a MOBILE locksmith service only — we come to the customer
+- NEVER mention key cutting or key duplication — we do NOT offer these services
+- Output must be clean HTML only — NO markdown, NO code fences, NO \`\`\`html
+- Start directly with the <h1> tag — no preamble
 
-After the HTML content add these two lines:
-META_TITLE: [60 char max title including keyword]
-META_DESCRIPTION: [155 char max description including keyword]`;
+---
+
+## 🎯 GOAL
+Create SEO-optimized blog content that:
+- Ranks on Google for local keywords
+- Converts visitors into calls/leads
+- Builds topical authority through internal linking
+
+---
+
+## 📌 ARTICLE STRUCTURE (MANDATORY)
+
+### 1. SEO TITLE (H1)
+- Must include main keyword + strong intent
+- Include urgency / benefit when possible
+Example: "Locksmith in Lonehill – Fast Mobile Service, 24/7 Response in 15–30 Minutes"
+
+### 2. INTRO (HOOK + PROBLEM)
+- Speak directly to the user's situation (locked out, urgent need)
+- Mention location naturally
+- Keep it human and clear
+
+### 3. SERVICE EXPLANATION
+- Mobile locksmith concept
+- Fast response
+- Coverage areas (mention: Lonehill, Fourways, Rivonia, Sandton, Midrand, Bryanston, Centurion)
+
+### 4. SERVICES SECTION (MANDATORY — use these exact H2 headings)
+- Emergency Locksmith
+- Residential Locksmith
+- Automotive Locksmith
+- Commercial Locksmith
+
+Each section must be clear, useful, and include local keyword variations naturally.
+
+### 5. INTERNAL LINKS (VERY IMPORTANT)
+Include ALL of these links naturally woven into the text as clickable anchor text:
+- <a href="${areaUrl}">${keyword}</a>
+- <a href="${SERVICES.emergency}">emergency locksmith</a>
+- <a href="${SERVICES.lockChange}">lock change services</a>
+- <a href="${SERVICES.residential}">residential locksmith</a>
+- <a href="${SERVICES.automotive}">automotive locksmith</a>
+- <a href="${SERVICES.commercial}">commercial locksmith</a>
+- <a href="${SERVICES.contact}">contact us</a>
+
+### 6. LOCAL SEO EXPANSION
+Mention nearby areas naturally: Lonehill, Fourways, Rivonia, Sandton, Midrand, Bryanston, Centurion
+
+### 7. CONVERSION CTA (MANDATORY — 2 TIMES)
+Mid-article: "Need a locksmith right now? We can arrive within 15–30 minutes."
+End of article: "Call now for immediate assistance – fast, professional, and available 24/7."
+
+### 8. FAQ SECTION (MANDATORY — minimum 3 questions)
+Examples:
+- How fast can a locksmith arrive?
+- Do you offer 24/7 locksmith services?
+- How much does a locksmith cost?
+Keep answers short and clear.
+
+---
+
+## 📈 SEO RULES
+- Use main keyword in title, first paragraph, and 2–3 times naturally
+- Use variations: "locksmith near me", "emergency locksmith", "24 hour locksmith", "mobile locksmith"
+- Avoid keyword stuffing
+
+## 🚫 DO NOT
+- Do NOT write generic content
+- Do NOT skip any sections
+- Do NOT write less than 800 words (target 900–1100 words)
+- Do NOT forget internal links
+- Do NOT forget CTA (x2)
+- Do NOT forget FAQ
+- Do NOT mention key cutting or key duplication
+
+---
+
+After the full HTML article, add these two lines:
+META_TITLE: [max 60 chars, include main keyword]
+META_DESCRIPTION: [max 155 chars, include main keyword, mention 24/7 and fast response]`;
 
   const message = await anthropic.messages.create({
     model: "claude-sonnet-4-6",
-    max_tokens: 2500,
+    max_tokens: 4000,
     messages: [{ role: "user", content: prompt }],
   });
 
@@ -94,14 +156,14 @@ META_DESCRIPTION: [155 char max description including keyword]`;
   const metaDescMatch = fullResponse.match(/META_DESCRIPTION:\s*(.+)/);
 
   const metaTitle = metaTitleMatch ? metaTitleMatch[1].trim() : `${keyword} - Sandton Locksmith`;
-  const metaDescription = metaDescMatch ? metaDescMatch[1].trim() : `Professional mobile locksmith services for ${keyword}. Available 24/7 in Sandton and surrounding areas.`;
+  const metaDescription = metaDescMatch ? metaDescMatch[1].trim() : `Professional mobile locksmith for ${keyword}. Available 24/7 in Sandton and surrounding areas. Fast response in 15-30 minutes.`;
 
   // Extract just the HTML content (before META_TITLE line)
   const htmlContent = fullResponse.split(/META_TITLE:/)[0].trim();
 
   // Extract h1 as title
   const titleMatch = htmlContent.match(/<h1[^>]*>([^<]+)<\/h1>/);
-  const title = titleMatch ? titleMatch[1] : `${keyword} - Expert Locksmith Services`;
+  const title = titleMatch ? titleMatch[1] : `${keyword} - Expert Mobile Locksmith`;
 
   return {
     title,
